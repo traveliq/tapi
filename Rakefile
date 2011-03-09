@@ -12,8 +12,8 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "TAPI"
-  gem.homepage = "http://github.com/traveliq/TAPI"
+  gem.name = "tapi"
+  gem.homepage = "http://github.com/traveliq/tapi"
   gem.license = "MIT"
   gem.summary = %Q{Reference client to the Travel IQ API at http://apiv3.travel-iq.com/}
   gem.description = gem.summary
@@ -44,7 +44,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "TAPI2 #{version}"
+  rdoc.title = "tapi #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
