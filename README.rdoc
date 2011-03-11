@@ -1,6 +1,139 @@
-= tapi
+= tapi - Client for the Travel IQ API
 
-Description goes here.
+This is the reference client implementation in Ruby for the Travel IQ API.
+
+The API is a RESTful webservice which enables you to build meta travel search services or programs.
+
+For the full documentation, visit http://apiv3.travel-iq.com/
+
+To access the API, you need an API key - you can get that by signing up for the Travel IQ affiliate program at http://www.travel-iq.com/partners .
+
+== Usage
+
+The TAPI client provides both easy HTTP request handling (with built-in, transparent HTTP etag handling), and a Parser that
+returns response data as dynamic documents that allow you to access the data and do subsequent requests with ease.
+
+This is best illustrated with an example. Here's how you autocomplete a location, start a hotel search, and query the results, using the tapi.
+
+Load up tapi in an irb session:
+
+    $ irb
+    => require 'rubygems'
+    => gem 'tapi'
+    => require 'tapi'
+
+Get the first city matching the name "Berlin":
+
+    => city = TAPI::V3::Client.new_from_get("http://apiv3.travel-iq.com/locations/cities/name/Berlin.json?key=traveliq").first.cities.first
+
+The client outputs what it's doing:
+
+    >> TAPI GET 0.221213 http://apiv3.travel-iq.com/locations/cities/name/Berlin.json?key=traveliq {}  "504f7ed4c2170bac4a8537eea29aa7b8"
+    >> Unknown ETag.
+
+And this is the result:
+
+    >> #<TAPI::V3::Client:0x1589a48
+       @document=
+        {:distance=>nil,
+         :latitude=>52.5166667,
+         :country=>"Deutschland",
+         :country_code=>"DE",
+         :population=>3383782,
+         :longitude=>13.4,
+         :resources=>
+          #<TAPI::V3::Client:0x1588e90
+           @document=
+            {:hotels_url=>
+              "http://apiv3.travel-iq.com/locations/cities/40784/hotels.json",
+             :city_url=>"http://apiv3.travel-iq.com/locations/cities/40784.json",
+             :airports_url=>
+              "http://apiv3.travel-iq.com/locations/cities/40784/airports.json",
+             :country_url=>"http://apiv3.travel-iq.com/locations/countries/10.json",
+             :description_url=>
+              "http://apiv3.travel-iq.com/locations/cities/40784/description.json"}>,
+         :name=>"Berlin",
+         :id=>40784,
+         :display_name=>"Berlin - Deutschland"}>
+
+Since all results are again instances of TAPI::V3::Client, you can both get the data with accessor methods:
+
+    >> city.name
+    => "Berlin"
+    >> city.latitude
+    => 52.5166667
+
+And query further parts of the API, which are always linked by the "resources" key in the API responses, by prepending "fetch_" to the resource name:
+
+    >> city.fetch_country
+    => #<TAPI::V3::Client:0x2137048
+         @document=
+          {:country=>
+            #<TAPI::V3::Client:0x21367b0
+             @document=
+              {:currency=>"EUR",
+               :code=>"DE",
+               :population=>83536115,
+               :recources=>
+                #<TAPI::V3::Client:0x2136648
+                 @document=
+                  {:country_url=>
+                    "http://apiv3.travel-iq.com/locations/countries/10.json",
+                   :cities_url=>
+                    "http://apiv3.travel-iq.com/locations/countries/10/cities.json"}>,
+               :name=>"Deutschland",
+               :id=>10}>},
+         @etag="\"3a762ad93a79192f474407a1d0a1f059\"">
+
+To start a search, you first need to configure the Search class, and set up the parameters in an instance:
+
+    >> TAPI::V3::Hotels::Search.config = {:key => "traveliq", :host => "apiv3.travel-iq.com", :port => "80", :path => ''}
+    >> search = TAPI::V3::Hotels::Search.new({:arrival_date => Date.today + 1, :departure_date => Date.today + 2, :city_id => city.id, :room_configuration => "[A]"})
+
+You can validate the parameters like in ActiveRecord with #valid?
+When everything's set up, start the search:
+
+    >> search.start!
+
+The search will take a little while to finish. You can query its status like this (note the reload, which does a new request to the API):
+
+    >> search.reload.status_detailed.state
+    => "running"
+
+Later:
+
+    >> search.reload.status_detailed.state
+    => "finished"
+
+You can look at the results of a search at any time. Keep in mind, though, that results will expire after a while - display results while the search is running or when finished,
+don't cache them in your application.
+
+    >> search.fetch_results.search.results.first.price
+    => 24.0
+
+
+== Installation
+
+    (sudo) gem install tapi
+
+Or, install latest version from Github with bundler by adding this to your Gemfile:
+
+    gem 'tapi', :git => 'git://github.com/traveliq/tapi.git'
+
+== Dependencies and Rubies
+
+You'll need the ActiveSupport, curl, and json gems, but that should be handled automatically.
+The client is tested under Ruby 1.8.7 (REE). It may not work well under 1.9 - feel free to contribute !
+
+== Authors
+
+Dr. Florian Odronitz (odo@mac.com)
+Matthias Georgi (http://www.matthias-georgi.de)
+Github release by Martin Tepper (monogreen.de)
+
+== Contact
+
+For questions, contact the authors or developer@traveliq.net
 
 == Contributing to tapi
  
