@@ -61,7 +61,7 @@ describe TAPI::V3::Hotels::Search, " validations" do
     lambda { search.room_configuration = '[A|2]x' }.should raise_error
     lambda { search.room_configuration = '[X]' }.should raise_error
     lambda { search.room_configuration = '[A][A][B]' }.should raise_error
-    lambda { search.room_configuration = '[A][A][A][A]' }.should raise_error
+    lambda { search.room_configuration = '[A][A][A][A][A][A][A]' }.should raise_error
   end
 
   it "should accept ISO date format" do
