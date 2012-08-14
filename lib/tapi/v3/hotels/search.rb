@@ -23,8 +23,8 @@ module TAPI
             add_error :room_configuration, "Bitte mindestens ein Zimmer angeben."
           end
 
-          if (single_rooms_count + double_rooms_count) > 3
-            add_error :room_configuration, "Bitte nicht mehr als 3 Zimmer angeben."
+          if (single_rooms_count + double_rooms_count) > 6
+            add_error :room_configuration, "Bitte nicht mehr als 6 Zimmer angeben."
           end
 
           if arrival_date and departure_date and departure_date <= arrival_date
