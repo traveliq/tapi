@@ -41,7 +41,7 @@ module TAPI
           
           def parse_room_configuration(str)
             rooms_strings = str.split('][').map {|r| r.gsub(/\]|\[/, '').split('|')}
-            raise ArgumentError, "#{str} is not a valid room configuration hash !" if rooms_strings.length > 3 ||  rooms_strings.empty?
+            raise ArgumentError, "#{str} is not a valid room configuration hash !" if rooms_strings.length > 6 ||  rooms_strings.empty?
             room_collection = {}
             rooms = rooms_strings.each_with_index do |guests, i|
               room_collection[i + 1] ||= {}
